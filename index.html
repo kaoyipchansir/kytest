@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>十二星座詳細介紹</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft JhengHei', 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 2px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px 20px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+            transform: scale(1.005);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e0e0e0;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        img:hover {
+            transform: rotate(10deg) scale(1.1);
+            border-color: #3498db;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .intro {
+            line-height: 1.6;
+            color: #555;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        tr:hover .intro {
+            color: #2980b9;
+        }
+
+        /* 星座名稱樣式 */
+        td:first-child {
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        /* 星座日期樣式 */
+        td:nth-child(2) {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            th, td {
+                padding: 12px 15px;
+            }
+
+            img {
+                width: 60px;
+                height: 60px;
+            }
+
+            .intro {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            th {
+                font-size: 0.8rem;
+                padding: 10px 8px;
+            }
+
+            td {
+                padding: 10px 8px;
+            }
+
+            td:first-child {
+                font-size: 1rem;
+            }
+
+            img {
+                width: 50px;
+                height: 50px;
+            }
+        }
+
+        /* 自定義滾動條 */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #3498db;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>十二星座詳細介紹</h1>
+
+    <div class="container">
+        <table>
+            <tr>
+                <th>星座名稱</th>
+                <th>星座日期</th>
+                <th>星座圖片</th>
+                <th>星座介紹</th>
+            </tr>
+            <!-- 白羊座 -->
+            <tr>
+                <td>白羊座</td>
+                <td>3月21日 - 4月19日</td>
+                <td><img src="images/白羊座.png" alt="白羊座圖片" loading="lazy"></td>
+                <td class="intro">白羊座是黃道十二宮的第一宮，守護星為火星。性格熱情、勇敢、衝動，充滿活力，喜歡挑戰，做事果斷，有領導才能，但有時難免魯莽。</td>
+            </tr>
+            <!-- 金牛座 -->
+            <tr>
+                <td>金牛座</td>
+                <td>4月20日 - 5月20日</td>
+                <td><img src="images/金牛座.png" alt="金牛座圖片" loading="lazy"></td>
+                <td class="intro">金牛座是黃道十二宮的第二宮，守護星為金星。性格穩重、務實、執著，為人可靠，喜歡舒適的生活，對美食和藝術有獨特品味，但有時過於固執。</td>
+            </tr>
+            <!-- 雙子座 -->
+            <tr>
+                <td>雙子座</td>
+                <td>5月21日 - 6月21日</td>
+                <td><img src="images/雙子座.png" alt="雙子座圖片" loading="lazy"></td>
+                <td class="intro">雙子座是黃道十二宮的第三宮，守護星為水星。性格聰明、靈活、善於交際，思維敏捷，興趣廣泛，適應能力強，但有時缺乏耐心，容易三分鐘熱度。</td>
+            </tr>
+            <!-- 巨蟹座 -->
+            <tr>
+                <td>巨蟹座</td>
+                <td>6月22日 - 7月22日</td>
+                <td><img src="images/巨蟹座.png" alt="巨蟹座圖片" loading="lazy"></td>
+                <td class="intro">巨蟹座是黃道十二宮的第四宮，守護星為月亮。性格溫柔、敏感、重感情，非常重視家庭，有強烈的保護欲，但有時容易多愁善感，缺乏安全感。</td>
+            </tr>
+            <!-- 獅子座 -->
+            <tr>
+                <td>獅子座</td>
+                <td>7月23日 - 8月22日</td>
+                <td><img src="images/獅子座.png" alt="獅子座圖片" loading="lazy"></td>
+                <td class="intro">獅子座是黃道十二宮的第五宮，守護星為太陽。性格自信、豪爽、熱情，有王者之風，喜歡成為關注的焦點，慷慨大方，但有時過於自負，愛面子。</td>
+            </tr>
+            <!-- 處女座 -->
+            <tr>
+                <td>處女座</td>
+                <td>8月23日 - 9月22日</td>
+                <td><img src="images/處女座.png" alt="處女座圖片" loading="lazy"></td>
+                <td class="intro">處女座是黃道十二宮的第六宮，守護星為水星。性格細心、謹慎、追求完美，做事認真負責，有很強的分析能力，但有時過於挑剔，容易鑽牛角尖。</td>
+            </tr>
+            <!-- 天秤座 -->
+            <tr>
+                <td>天秤座</td>
+                <td>9月23日 - 10月23日</td>
+                <td><img src="images/天秤座.png" alt="天秤座圖片" loading="lazy"></td>
+                <td class="intro">天秤座是黃道十二宮的第七宮，守護星為金星。性格平和、友善、善於交際，追求公平與和諧，有很強的協調能力，但有時容易猶豫不決，缺乏主見。</td>
+            </tr>
+            <!-- 天蠍座 -->
+            <tr>
+                <td>天蠍座</td>
+                <td>10月24日 - 11月22日</td>
+                <td><img src="images/天蠍座.png" alt="天蠍座圖片" loading="lazy"></td>
+                <td class="intro">天蠍座是黃道十二宮的第八宮，守護星為冥王星。性格神秘、執著、有韌性，意志力強，洞察力敏銳，對感情專一，但有時容易記仇，占有欲強。</td>
+            </tr>
+            <!-- 射手座 -->
+            <tr>
+                <td>射手座</td>
+                <td>11月23日 - 12月21日</td>
+                <td><img src="images/射手座.png" alt="射手座圖片" loading="lazy"></td>
+                <td class="intro">射手座是黃道十二宮的第九宮，守護星為木星。性格樂觀、開朗、熱愛自由，喜歡冒險和探索，思維開闊，為人直率，但有時容易粗心大意，缺乏責任感。</td>
+            </tr>
+            <!-- 摩羯座 -->
+            <tr>
+                <td>摩羯座</td>
+                <td>12月22日 - 1月19日</td>
+                <td><img src="images/摩羯座.png" alt="摩羯座圖片" loading="lazy"></td>
+                <td class="intro">摩羯座是黃道十二宮的第十宮，守護星為土星。性格沉穩、內斂、有耐心，目標明確，腳踏實地，非常勤奮，但有時過於保守，缺乏樂趣。</td>
+            </tr>
+            <!-- 水瓶座 -->
+            <tr>
+                <td>水瓶座</td>
+                <td>1月20日 - 2月18日</td>
+                <td><img src="images/水瓶座.png" alt="水瓶座圖片" loading="lazy"></td>
+                <td class="intro">水瓶座是黃道十二宮的第十一宮，守護星為天王星。性格獨特、創新、思想開放，喜歡與眾不同，重視友誼，有很強的人道主義精神，但有時過於冷漠，難以捉摸。</td>
+            </tr>
+            <!-- 雙魚座 -->
+            <tr>
+                <td>雙魚座</td>
+                <td>2月19日 - 3月20日</td>
+                <td><img src="images/雙魚座.png" alt="雙魚座圖片" loading="lazy"></td>
+                <td class="intro">雙魚座是黃道十二宮的第十二宮，守護星為海王星。性格善良、溫柔、富有想象力，感性浪漫，有很強的同情心，但有時容易逃避現實，過於軟弱。</td>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        // 圖片加載失敗時顯示默認圖標
+        document.querySelectorAll('img').forEach(img => {
+            img.onerror = function() {
+                this.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjZTBlMGUwIiBkPSJNMjU2IDhDMTE5IDggOCAxMTkgOCAyNTZzMTExIDI0OCAyNDggMjQ4IDI0OC0xMTEgMjQ4LTI0OFMzOTMgOCAyNTYgOHptMCA0NDhjLTExMC41IDAtMjAwLTg5LjUtMjAwLTIwMFMxNDUuNSA1NiAyNTYgNTZzMjAwIDg5LjUgMjAwIDIwMC04OS41IDIwMC0yMDAgMjAwem0tMTIwLTE2MmMwLTE2LjY3IDEzLjMzLTMyIDMyLTMyczMyIDE1LjMzIDMyIDMyLTUzLjMzIDY0LTEyMCA2NFMzMjAgNDM1LjMzIDMyMCA0MTZjMC0xNi42Ny0xMy4zMy0zMi0zMi0zMnoiLz48L3N2Zz4=';
+                this.alt = '星座默認圖標';
+            }
+        });
+
+        // 平滑滾動效果
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
