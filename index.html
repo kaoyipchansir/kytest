@@ -3,62 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>普通話學習助手 (本地測試版)</title>
+    <title>AI 普通話學習助手</title>
     <style>
         body { font-family: sans-serif; text-align: center; padding: 20px; background-color: #f4f4f9; }
         .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { font-size: 1.8rem; color: #333; }
-        .phrase-box { font-size: 2rem; margin: 25px 0; color: #0056b3; font-weight: bold; min-height: 60px; }
-        button { font-size: 1.2rem; padding: 12px 20px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; color: white; width: 80%; max-width: 300px; }
-        .btn-gen { background-color: #17a2b8; }
-        .btn-play { background-color: #28a745; }
-        .btn-record { background-color: #dc3545; }
+        h1 { font-size: 1.8rem; color: #333; margin-bottom: 5px; }
+        .subtitle { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
+        
+        /* 提問框設計 */
+        .input-group { background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ddd; }
+        input[type="text"] { width: 90%; padding: 10px; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 10px; }
+        
+        .phrase-box { font-size: 2rem; margin: 25px 0; color: #0056b3; font-weight: bold; min-height: 60px; word-wrap: break-word; }
+        
+        button { font-size: 1.1rem; padding: 12px 20px; margin: 5px; border: none; border-radius: 8px; cursor: pointer; color: white; width: 100%; max-width: 300px; box-sizing: border-box; }
+        .btn-custom { background-color: #6f42c1; } /* 紫色自訂生成 */
+        .btn-quick { background-color: #17a2b8; }  /* 藍色快捷生成 */
+        .btn-play { background-color: #28a745; }   /* 綠色播放 */
+        .btn-record { background-color: #dc3545; font-weight: bold; margin-top: 15px; } /* 紅色錄音 */
+        
         .result-box { margin-top: 25px; font-size: 1.3rem; font-weight: bold; line-height: 1.5; min-height: 80px; }
-        .debug-info { margin-top: 20px; font-size: 0.9rem; color: #888; }
+        .debug-info { margin-top: 20px; font-size: 0.85rem; color: #888; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>💬 普通話發音練習 (本地測試)</h1>
+    <h1>🤖 AI 普通話發音練習</h1>
+    <div class="subtitle">Powered by Dify & Web Speech API</div>
     
-    <div id="targetPhrase" class="phrase-box">點擊生成獲取句子...</div>
+    <!-- 1. AI 句子生成區 -->
+    <div class="input-group">
+        <input type="text" id="customPrompt" placeholder="想學什麼？(例：教我一句餐廳點餐的話)">
+        <button class="btn-custom" onclick="generateFromDify('custom')">✨ 根據要求生成句子</button>
+        <button class="btn-quick" onclick="generateFromDify('quick')">🎲 隨機產生日常用語 (快捷鍵)</button>
+    </div>
     
-    <button class="btn-gen" onclick="generatePhrase()">1. 產生句子 (本地)</button>
-    <button class="btn-play" onclick="playAudio()">2. 聽示範發音</button>
-    <button class="btn-record" id="recordBtn" onclick="startRecording()">3. 點擊開始朗讀</button>
+    <!-- 顯示目標句子 -->
+    <div id="targetPhrase" class="phrase-box">請先生成練習句子...</div>
     
+    <!-- 2. 語音功能區 -->
+    <button class="btn-play" onclick="playAudio()">🔊 聽示範發音</button>
+    <button class="btn-record" id="recordBtn" onclick="startRecording()">🎤 點擊開始朗讀</button>
+    
+    <!-- 顯示辨識結果 -->
     <div id="resultText" class="result-box"></div>
-    <div id="debugText" class="debug-info">系統準備就緒。請測試麥克風功能。</div>
+    <div id="debugText" class="debug-info">系統準備就緒。請確認已填入有效的 Dify API Key。</div>
 </div>
 
 <script>
     let currentPhrase = "";
 
     // ==========================================
-    // 1. 本地隨機句子 (略過 Dify API)
+    // 1. Dify API 串接 (自訂與快捷生成)
     // ==========================================
-    function generatePhrase() {
-        const mockPhrases = [
-            "你好，很高興認識你", 
-            "請問地鐵站怎麼走", 
-            "這杯咖啡多少錢", 
-            "今天天氣非常不錯",
-            "我想吃一個漢堡包",
-            "你的普通話說得真好"
-        ];
+    async function generateFromDify(mode) {
+        // ⚠️ 請在這裡填寫你真實的 Dify API Key
+        const API_KEY = 'YOUR_DIFY_API_KEY'; 
+        const API_URL = 'https://api.dify.ai/v1/chat-messages'; 
+
+        const targetBox = document.getElementById('targetPhrase');
+        const debugBox = document.getElementById('debugText');
         
-        const randomIndex = Math.floor(Math.random() * mockPhrases.length);
-        currentPhrase = mockPhrases[randomIndex]; 
+        let userQuery = "";
         
-        document.getElementById('targetPhrase').innerText = currentPhrase;
+        // 根據按鈕模式決定提示詞
+        if (mode === 'quick') {
+            userQuery = "請給我一句適合練習普通話發音的日常用語，字數在5到15字之間。";
+            document.getElementById('customPrompt').value = ""; // 清空輸入框
+        } else {
+            const customInput = document.getElementById('customPrompt').value.trim();
+            if (!customInput) return alert("請先在輸入框告訴我你想學什麼！");
+            userQuery = customInput + "。";
+        }
+
+        // 系統級的強制要求：確保輸出格式能用來做文字比對 (繁體、無引號、無拼音)
+        const systemRule = "請務必使用「繁體中文」回覆。只直接回覆句子或詞語本身，絕對不要包含任何引號、拼音、標點符號或解釋文字。";
+        
+        const requestData = {
+            "inputs": {}, 
+            "query": userQuery + systemRule,
+            "response_mode": "blocking", 
+            "conversation_id": "",       
+            "user": "student-01"         
+        };
+
+        targetBox.innerText = "⏳ AI 正在思考中...";
         document.getElementById('resultText').innerText = "";
-        document.getElementById('debugText').innerText = "✅ 已載入本地句子。";
+        debugBox.innerText = "正在呼叫 Dify API...";
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            if (!response.ok) throw new Error(`狀態碼：${response.status}`);
+
+            const result = await response.json();
+            
+            // 清理可能殘留的標點或換行符
+            currentPhrase = result.answer.replace(/[，。！？、,!?\n"']/g, '').trim(); 
+            
+            targetBox.innerText = currentPhrase;
+            debugBox.innerText = `✅ 生成成功！(模式: ${mode})`;
+
+        } catch (error) {
+            console.error("API 錯誤:", error);
+            targetBox.innerText = "❌ 生成失敗，請檢查 API Key";
+            debugBox.innerText = `API 請求失敗: ${error.message}`;
+        }
     }
 
     // ==========================================
-    // 2. 語音朗讀 (TTS)
-    // ========================讀 (TTS)
+    // 2. 語音朗讀 (TTS) - 保持 zh-TW (繁體國語)
     // ==========================================
     function playAudio() {
         if (!currentPhrase) return alert("請先產生句子！");
@@ -73,36 +135,30 @@
     }
 
     // ==========================================
-    // 3. 語音辨識 (STT) 與比對邏輯
+    // 3. 語音辨識 (STT) - 極速優化版 (支援手動停止)
     // ==========================================
-        // ==========================================
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
-    let isRecording = false; // 新增：用來記錄現在是否正在錄音
+    let isRecording = false; 
 
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.lang = 'zh-TW'; 
-        
-        // 【關鍵優化 1】開啟即時辨識！邊講邊出字
+        recognition.lang = 'zh-TW'; // 聽普通話，輸出繁體字
         recognition.interimResults = true; 
         
         recognition.onstart = function() {
             isRecording = true;
             const btn = document.getElementById('recordBtn');
-            btn.innerText = "⏹️ 講完請按這裡停止"; // 提示使用者按停
+            btn.innerText = "⏹️ 講完請按這裡停止"; 
             btn.style.backgroundColor = "#ffc107";
             document.getElementById('resultText').style.color = "black";
             document.getElementById('resultText').innerText = "🗣️ 正在聆聽...";
-            document.getElementById('debugText').innerText = "麥克風運作中...";
         };
 
         recognition.onresult = function(event) {
             let interimTranscript = '';
             let finalTranscript = '';
 
-            // 把即時的字和最終的字分開處理
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
                     finalTranscript += event.results[i][0].transcript;
@@ -111,19 +167,16 @@
                 }
             }
 
-            // 如果有即時的字，先顯示在畫面上讓學生安心
             if (interimTranscript !== '') {
                 document.getElementById('resultText').innerText = "🗣️ 聽到: " + interimTranscript;
             }
 
-            // 如果有最終的字，才進行答案比對
             if (finalTranscript !== '') {
                 checkPronunciation(finalTranscript);
             }
         };
 
         recognition.onerror = function(event) {
-            // (錯誤處理邏輯保持不變)
             const resultBox = document.getElementById('resultText');
             resultBox.style.color = "red";
             resultBox.innerText = `❌ 錯誤: ${event.error}`;
@@ -143,12 +196,10 @@
         alert("你的瀏覽器不支援語音辨識功能，請使用 Chrome 瀏覽器。");
     }
 
-    // 【關鍵優化 2】講完立刻手動按停，免等 40 秒！
     function startRecording() {
         if (!currentPhrase) return alert("請先產生句子！");
         if (recognition) {
             if (isRecording) {
-                // 如果已經在錄音，再按一下就「強制停止」並馬上結算！
                 recognition.stop();
                 return;
             }
@@ -164,28 +215,62 @@
     function resetRecordButton() {
         isRecording = false;
         const btn = document.getElementById('recordBtn');
-        btn.innerText = "3. 點擊開始朗讀";
+        btn.innerText = "🎤 點擊開始朗讀";
         btn.style.backgroundColor = "#dc3545"; 
     }
-
-    
 
     // ==========================================
     // 4. 文字比對邏輯
     // ==========================================
+    // ==========================================
+    // 4. 文字比對邏輯 (加入紅綠顏色高亮功能)
+    // ==========================================
     function checkPronunciation(userSaid) {
         const resultBox = document.getElementById('resultText');
-        const cleanTarget = currentPhrase.replace(/[，。！？、,!?]/g, '').trim();
-        const cleanUser = userSaid.replace(/[，。！？、,!?]/g, '').trim();
+        
+        // 移除標點符號進行純漢字比對
+        const cleanTarget = currentPhrase.replace(/[，。！？、,!?\s]/g, '').trim();
+        const cleanUser = userSaid.replace(/[，。！？、,!?\s]/g, '').trim();
 
         if (cleanTarget === cleanUser) {
+            // 全對的情況
             resultBox.style.color = "green";
             resultBox.innerHTML = `✅ 發音完美！你說了：<br>"${userSaid}"`;
         } else {
-            resultBox.style.color = "red";
-            resultBox.innerHTML = `❌ 還差一點！<br>你說了："${userSaid}"<br>標準是："${cleanTarget}"`;
+            // 有錯的情況，進行逐字比對上色
+            let coloredUser = "";
+            let coloredTarget = "";
+            
+            // 找出兩句話哪一句比較長，作為迴圈比對的最大次數
+            const maxLength = Math.max(cleanTarget.length, cleanUser.length);
+            
+            for (let i = 0; i < maxLength; i++) {
+                const tChar = cleanTarget[i] || ""; // 標準句子在該位置的字
+                const uChar = cleanUser[i] || "";   // 學生讀出在該位置的字
+                
+                if (tChar === uChar) {
+                    // 發音正確 (綠色)
+                    if (uChar) coloredUser += `<span style="color: green;">${uChar}</span>`;
+                    if (tChar) coloredTarget += `<span style="color: green;">${tChar}</span>`;
+                } else {
+                    // 發音錯誤、多讀或漏讀 (紅色)
+                    if (uChar) coloredUser += `<span style="color: red; font-weight: bold;">${uChar}</span>`;
+                    if (tChar) coloredTarget += `<span style="color: red; font-weight: bold;">${tChar}</span>`;
+                }
+            }
+
+            // 更新畫面顯示
+            resultBox.style.color = "#333"; // 外框文字改回深灰色
+            resultBox.innerHTML = `
+                ❌ 還差一點！<br>
+                <div style="margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                    <div style="margin-bottom: 8px;">你說了：${coloredUser}</div>
+                    <div>標準是：${coloredTarget}</div>
+                </div>
+            `;
         }
     }
+
 </script>
 
 </body>
