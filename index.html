@@ -65,7 +65,7 @@
         window.speechSynthesis.cancel();
         
         const utterance = new SpeechSynthesisUtterance(currentPhrase);
-        utterance.lang = 'zh-CN'; 
+        utterance.lang = 'zh-TW'; 
         utterance.rate = 0.8;     
         window.speechSynthesis.speak(utterance);
         
@@ -83,7 +83,7 @@
 
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
-        recognition.lang = 'zh-CN'; 
+        recognition.lang = 'zh-TW'; 
         
         // 【關鍵優化 1】開啟即時辨識！邊講邊出字
         recognition.interimResults = true; 
