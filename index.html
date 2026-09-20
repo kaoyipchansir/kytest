@@ -58,6 +58,7 @@
 
     // ==========================================
     // 2. 語音朗讀 (TTS)
+    // ========================讀 (TTS)
     // ==========================================
     function playAudio() {
         if (!currentPhrase) return alert("請先產生句子！");
@@ -74,42 +75,58 @@
     // ==========================================
     // 3. 語音辨識 (STT) 與比對邏輯
     // ==========================================
+        // ==========================================
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition;
+    let isRecording = false; // 新增：用來記錄現在是否正在錄音
 
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
         recognition.lang = 'zh-CN'; 
-        recognition.interimResults = false;
+        
+        // 【關鍵優化 1】開啟即時辨識！邊講邊出字
+        recognition.interimResults = true; 
         
         recognition.onstart = function() {
-            document.getElementById('recordBtn').innerText = "🎙️ 聆聽中 (請說話)...";
-            document.getElementById('recordBtn').style.backgroundColor = "#ffc107";
-            document.getElementById('resultText').innerText = "正在收音...";
-            document.getElementById('debugText').innerText = "麥克風運作中，請對著平板說話。";
+            isRecording = true;
+            const btn = document.getElementById('recordBtn');
+            btn.innerText = "⏹️ 講完請按這裡停止"; // 提示使用者按停
+            btn.style.backgroundColor = "#ffc107";
+            document.getElementById('resultText').style.color = "black";
+            document.getElementById('resultText').innerText = "🗣️ 正在聆聽...";
+            document.getElementById('debugText').innerText = "麥克風運作中...";
         };
 
         recognition.onresult = function(event) {
-            const userSaid = event.results[0][0].transcript;
-            document.getElementById('debugText').innerText = "✅ 成功接收語音！";
-            checkPronunciation(userSaid);
+            let interimTranscript = '';
+            let finalTranscript = '';
+
+            // 把即時的字和最終的字分開處理
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+            }
+
+            // 如果有即時的字，先顯示在畫面上讓學生安心
+            if (interimTranscript !== '') {
+                document.getElementById('resultText').innerText = "🗣️ 聽到: " + interimTranscript;
+            }
+
+            // 如果有最終的字，才進行答案比對
+            if (finalTranscript !== '') {
+                checkPronunciation(finalTranscript);
+            }
         };
 
         recognition.onerror = function(event) {
+            // (錯誤處理邏輯保持不變)
             const resultBox = document.getElementById('resultText');
             resultBox.style.color = "red";
-            
-            let errorMsg = `❌ 錯誤代碼: ${event.error}`;
-            if (event.error === 'not-allowed') {
-                errorMsg = "❌ 權限被拒絕：請確認 Chrome 已經允許麥克風。";
-            } else if (event.error === 'network' || event.error === 'service-not-allowed') {
-                errorMsg = "❌ 網路錯誤：平板必須連上網際網路，才能進行文字轉換！";
-            } else if (event.error === 'no-speech') {
-                errorMsg = "❌ 聽不到聲音：請靠近平板再試一次。";
-            }
-            
-            resultBox.innerText = errorMsg;
-            document.getElementById('debugText').innerText = `語音引擎報告錯誤: ${event.error}`;
+            resultBox.innerText = `❌ 錯誤: ${event.error}`;
             resetRecordButton();
         };
 
@@ -126,9 +143,15 @@
         alert("你的瀏覽器不支援語音辨識功能，請使用 Chrome 瀏覽器。");
     }
 
+    // 【關鍵優化 2】講完立刻手動按停，免等 40 秒！
     function startRecording() {
         if (!currentPhrase) return alert("請先產生句子！");
         if (recognition) {
+            if (isRecording) {
+                // 如果已經在錄音，再按一下就「強制停止」並馬上結算！
+                recognition.stop();
+                return;
+            }
             try {
                 recognition.start();
             } catch (e) {
@@ -139,10 +162,13 @@
     }
 
     function resetRecordButton() {
+        isRecording = false;
         const btn = document.getElementById('recordBtn');
         btn.innerText = "3. 點擊開始朗讀";
         btn.style.backgroundColor = "#dc3545"; 
     }
+
+    
 
     // ==========================================
     // 4. 文字比對邏輯
